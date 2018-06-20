@@ -23,30 +23,40 @@ def get_DB_list(dbname, user, password, host):
         cur.close()
         conn.close()
     except (psycopg2.OperationalError) as e:
-        logger.log("Error: " + str(e))
+        logger.log("Error: " + str(e), 0)
     except:
-        logger.log(str(sys.exc_info()))
+        logger.log(str(sys.exc_info()), 0)
     return data
 
 def create_connection(dbname, user, password, host):
     # Connect to the source DB and create a cursor.
     try:
-        logger.log("Connecting to " + dbname, 0)
-        conn = psycopg2.connect(dbname=dbname, user=user, password=password, host=host)
+        logger.log("Connecting to " + dbname)
+        conn = psycopg2.connect(dbname=str(dbname), user=user, password=password, host=host)
         cur = conn.cursor()
+
+        SQL = '''select "column_name" from information_schema.columns where table_name = 'state_of_channel_activity';'''
+        cur.execute(SQL)
+        activity_headers = cur.fetchall()
 
         SQL = 'select * from state_of_channel_activity;'
         cur.execute(SQL)
         activity = cur.fetchall()
-        #logger.log(activity);
+        #Prepend the headers to the top of the list
+        activity.insert(0, activity_headers)
         activity_prep = {}
         activity_prep.update({"Sheet 1":activity})
         save_data("exports/" + dbname + "_activity.xls", activity_prep)
+
+        SQL = '''select "column_name" from information_schema.columns where table_name = 'state_of_channel_campaign';'''
+        cur.execute(SQL)
+        campaign_headers = cur.fetchall()
 
         SQL = 'select * from state_of_channel_campaign;'
         cur.execute(SQL)
         campaign = cur.fetchall()
         #logger.log(campaign);
+        campaign.insert(0, campaign_headers)
         campaign_prep = {}
         campaign_prep.update({"Sheet 1":campaign})
         save_data("exports/" + dbname + "_campaign.xls", campaign_prep)
@@ -55,9 +65,9 @@ def create_connection(dbname, user, password, host):
         conn.close()
 
     except (psycopg2.OperationalError) as e:
-        logger.log("Error: " + str(e))
+        logger.log("Error: " + str(e), 0)
     except:
-        logger.log(str(sys.exc_info()))
+        logger.log(str(sys.exc_info()), 0)
 
 
 def input_stuff(message, default):
@@ -92,17 +102,16 @@ try:
 
     #Create the DB connection and cursor.
     databases = get_DB_list(dbname, user, password, host)
-    print(databases)
 
     for database in databases:
-        if database not in ('postgres', 'template0', 'template1'):
+        if database[0] not in ('postgres', 'template0', 'template1'):
             create_connection(database[0], user, password, host)
         else:
             continue
 
 except (psycopg2.ProgrammingError) as e:
-    logger.log("Warning: " + str(e))
+    logger.log("Warning: " + str(e), 0)
 except (psycopg2.InternalError) as e:
-    logger.log("Error: " + str(e))
+    logger.log("Error: " + str(e), 0)
 except:
-    logger.log(sys.exc_info())
+    logger.log(sys.exc_info(), 0)
