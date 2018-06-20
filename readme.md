@@ -8,4 +8,4 @@
 
 1. Run `source <env>/bin/activate` to activate the virtual environment.
 1. Run `pip install -r requirements.txt` to install module dependencies.
-1. Run `python py_migrate.py` and proide information at the prompts.
+1. Run `python excel.py` and proide information at the prompts.
