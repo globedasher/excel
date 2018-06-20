@@ -1,6 +1,6 @@
 from pyexcel_xls import save_data
 from py_core import logger
-import getpass, psycopg2
+import getpass, psycopg2, sys
 
 def create_connection():
     #Request needed info from command line.
@@ -30,7 +30,7 @@ def create_connection():
         logger.log("Error: " + str(e))
         sys.exit(2)
     except:
-        logger.log("Unhandled exception:\n" + str(sys.exc_info()))
+        logger.log(str(sys.exc_info()))
         sys.exit(2)
     return conn
 
@@ -53,8 +53,8 @@ try:
     # If the name is an instance number, that must be converted into an int to
     # get the SQL command to view the text as a role name.
     source_cur.execute(SQL)
-    data = source_cur.fetchall()
-    logger.log(data);
+    old_data = source_cur.fetchall()
+    logger.log(old_data);
     SQL = 'select add(1,2);'
     source_cur.execute(SQL)
     data = source_cur.fetchall()
@@ -64,7 +64,7 @@ except (psycopg2.ProgrammingError) as e:
 except (psycopg2.InternalError) as e:
     logger.log("Error: " + str(e))
 except:
-    logger.log("Unhandled exception\n%s" % sys.exc_info())
+    logger.log(sys.exc_info())
     sys.exit(2)
 
 print(data)
@@ -81,10 +81,10 @@ print(row)
 try:
     data = {}
     print(data)
-    data.update({"Sheet 1":[row, row]})
+    data.update({"Sheet 1":old_data})
 
     row = row[::-1]
     save_data("mytmp.xls",data)
 except:
-    logger.log("Unhandled exception\n%s" % sys.exc_info())
+    logger.log(sys.exc_info())
     sys.exit(2)
