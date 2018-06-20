@@ -1,3 +1,6 @@
 [submodule "core"]
 	path = core
 	url = https://github.com/globedasher/py_core
+[submodule "py_core"]
+	path = py_core
+	url = https://github.com/globedasher/py_core

@@ -30,34 +30,28 @@ def get_DB_list(dbname, user, password, host):
 
 def create_connection(dbname, user, password, host):
     # Connect to the source DB and create a cursor.
-    try:
-        logger.log("Connecting to " + dbname, 0)
-        conn = psycopg2.connect(dbname=dbname, user=user, password=password, host=host)
-        cur = conn.cursor()
+    logger.log("Connecting to " + dbname, 0)
+    conn = psycopg2.connect(dbname=dbname, user=user, password=password, host=host)
+    cur = conn.cursor()
 
-        SQL = 'select * from state_of_channel_activity;'
-        cur.execute(SQL)
-        activity = cur.fetchall()
-        #logger.log(activity);
-        activity_prep = {}
-        activity_prep.update({"Sheet 1":activity})
-        save_data("exports/" + dbname + "_activity.xls", activity_prep)
+    SQL = 'select * from state_of_channel_activity;'
+    cur.execute(SQL)
+    activity = cur.fetchall()
+    #logger.log(activity);
+    activity_prep = {}
+    activity_prep.update({"Sheet 1":activity})
+    save_data("exports/" + dbname + "_activity.xls", activity_prep)
 
-        SQL = 'select * from state_of_channel_campaign;'
-        cur.execute(SQL)
-        campaign = cur.fetchall()
-        #logger.log(campaign);
-        campaign_prep = {}
-        campaign_prep.update({"Sheet 1":campaign})
-        save_data("exports/" + dbname + "_campaign.xls", campaign_prep)
-	
-        cur.close()
-        conn.close()
-
-    except (psycopg2.OperationalError) as e:
-        logger.log("Error: " + str(e))
-    except:
-        logger.log(str(sys.exc_info()))
+    SQL = 'select * from state_of_channel_campaign;'
+    cur.execute(SQL)
+    campaign = cur.fetchall()
+    #logger.log(campaign);
+    campaign_prep = {}
+    campaign_prep.update({"Sheet 1":campaign})
+    save_data("exports/" + dbname + "_campaign.xls", campaign_prep)
+    
+    cur.close()
+    conn.close()
 
 
 def input_stuff(message, default):
