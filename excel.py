@@ -154,7 +154,7 @@ try:
     logger.log("Username %s" % user, 0)
 
     #Obviously, don't log the role password in the log
-    password = input("Role password:")
+    password = getpass.getpass("Role password:")
 
     #Create the DB connection and cursor.
     dbname = "_qstemplate"
